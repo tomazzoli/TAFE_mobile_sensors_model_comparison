@@ -1,7 +1,7 @@
 import tensorflow as tf
 from fileManager import FileDataManager
 from inputGeneration import DatasetManager
-from modelGeneration import ModelManager
+from genericModelGeneration import ModelManager
 from constants import *
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import (mean_absolute_error as mae,

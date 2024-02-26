@@ -2,7 +2,7 @@ import os
 from hyperParameters import HyperParameters
 from fileManager import FileDataManager
 from inputGeneration import DatasetManager
-from modelGeneration import ModelManager
+from bilstmModelGeneration import BILSTMModelManager
 from constants import *
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import (mean_absolute_error as mae,
@@ -20,7 +20,7 @@ class ModelEvaluator:
         self.__dataManager = self.__initDataManager(data_headers)
         self.__x_train, self.__x_test, self.__y_train, self.__y_test = self.__create_dataset(shuffle)
 
-        self.__model = self.__initModel()
+        self.__modelbidir = self.__initModel()
 
     def __generateFileName(self):
         filename = DIR_DATI+os.path.sep+CSV_BASE_NAME+str(self.__sensor)+CSV_EXTENSION
@@ -47,15 +47,38 @@ class ModelEvaluator:
         numfeatures = self.__x_train.shape[2]
         self.hyperparameters.timesteps = timesteps
         self.hyperparameters.numfeatures = numfeatures
-        mm = ModelManager(self.__sensor, self.hyperparameters, reTrain=True,dirModelli=dirModelli)
+        mm = BILSTMModelManager(self.__sensor, self.hyperparameters, reTrain=True,dirModelli=dirModelli)
         if mm.isModelTrained() == False:
             mm.trainModel(self.__x_train, self.__y_train)
         my_model = mm.getModel()
         return my_model
 
-    def evaluate(self):
+    def evaluate(self,reTrain=True):
+        if reTrain:
+            self.__modelbidir.train(self.__x_train, self.__y_train)
+            self.__modelbidir.saveModel()
+        mape_bidir = self.evaluateSingleModel(self.__modelbidir)
+        # mape_binormal = self.evaluateSingleModel(self.__modelnormal)
+        # risolvere problema con evaluate che si pianta nella denormalizzazione
+        mape_binormal = -1
+        return mape_bidir, mape_binormal
+
+    def evaluateSingleModel(self, model):
         batch_size = self.hyperparameters.batch_size
-        result = self.__model.predict(self.__x_test, batch_size=batch_size)
+        result = model.predict(self.__x_test, batch_size=batch_size)
+        scaler = self.__dataManager.getPredictedNormalizer()
+        predicted = scaler.inverse_transform(result)
+        # retrieve only the last element of each sequence (return_sequences=False)
+        time_lag = self.hyperparameters.timesteps
+        y_test = scaler.inverse_transform(self.__y_test[0:len(self.__y_test), time_lag - 1])
+
+        sklearn_metrics_mape = mape(y_test, predicted)
+        print('sklearn.metrics.mape ', sklearn_metrics_mape)
+        return sklearn_metrics_mape
+
+    def evaluateOld(self):
+        batch_size = self.hyperparameters.batch_size
+        result = self.__modelbidir.predict(self.__x_test, batch_size=batch_size)
         scaler = self.__dataManager.getPredictedNormalizer()
         #predicted = scaler.inverse_transform(result.reshape(len(result), len(result[0])))
         #y_test = scaler.inverse_transform(self.__y_test.reshape(len(self.__y_test), len(self.__y_test[0])))
@@ -67,3 +90,11 @@ class ModelEvaluator:
         sklearn_metrics_mape = mape(y_test, predicted)
         print('sklearn.metrics.mape ', sklearn_metrics_mape)
         return sklearn_metrics_mape,predicted
+
+    def getSplittedDataset(self):
+        result = {XTRAIN_LABEL:self.__x_train,YTRAIN_LABEL:self.__y_train,XTEST_LABEL:self.__x_test,YTEST_LABEL:self.__y_test}
+        return result
+
+    def getBILSTMModel(self):
+        result = {BILSTM_MODEL_LABEL:self.__modelbidir}
+        return result

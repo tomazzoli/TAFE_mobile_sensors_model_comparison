@@ -14,10 +14,10 @@ numlayers = 2
 batch_size = 1
 validation_split = 0.1
 # DOPPI PER VELOCITA'
-#default_epochs = 50
-#default_time_lag = 4
-#batch_size = 128
-#thisdropout = 0.2
+default_epochs = 5
+default_time_lag = 4
+batch_size = 128
+thisdropout = 0.2
 thisdropout = 0.0
 batch_size = 32
 
@@ -78,9 +78,9 @@ if __name__ == '__main__':
     print('iniziato')
     to_csv=[]
     out = {}
-    for sensore in range(1,8):#era 1,8
+    for sensore in range(1,2):#era 1,8
         st = time.time()
-        out = myMain(epochs = 350,time_lag = 5,sensore=sensore)
+        out = myMain(epochs = 3,time_lag = 5,sensore=sensore)
         et = time.time()
         tempo = (et - st) / 60
         out['sensore']= sensore
