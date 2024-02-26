@@ -30,7 +30,7 @@ def generateCSVFileName(nomeFile):
     filename = DIR_ESITI + os.path.sep + nomeFile + CSV_EXTENSION
     return filename
 
-def defineHyperParams(datadescr,time_lag=-1,epochs=-1,dropout=-1,shuffle=True):
+def defineHyperParams(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,shuffle=True):
     hyperparameterValues = {
         BATCH_SIZE_LABEL: batch_size,
         VALIDATION_SPLIT_LABEL: validation_split,
@@ -55,19 +55,23 @@ def defineHyperParams(datadescr,time_lag=-1,epochs=-1,dropout=-1,shuffle=True):
     result = HyperParameters(hyperparameterValues)
     return result
 
-def myMain(time_lag=-1,epochs=-1,dropout=-1,sensore=SENSORE):
+def myMain(time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
     result = {}
     datadescr = 'base'
     st = time.time()
     result = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore)
-    graficoOverfitting = OverfittingVisualizer(result.get(HYPERPARAM_LABEL),
-                                               result.get(BILSTM_MODEL_LABEL),
-                                               result.get(DIR_DATI), mape=result.get(MAPE_LABEL))
-    history = graficoOverfitting.eval(epochs=epochs,time_lag=time_lag, dropout=dropout)
-    result[HISTORY_LABEL] = history
+    #grafico = verificaGrafica(result,time_lag)
+    #result[HISTORY_LABEL] = grafico.get(HISTORY_LABEL)
     return result
 
-def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-1,sensore=SENSORE):
+def verificaGrafica(resultPrecedente,time_lag):
+    graficoOverfitting = OverfittingVisualizer(resultPrecedente.get(HYPERPARAM_LABEL),
+                                               resultPrecedente.get(BILSTM_MODEL_LABEL),
+                                               resultPrecedente.get(DIR_DATI), mape=resultPrecedente.get(MAPE_LABEL))
+    history = graficoOverfitting.eval(epochs=epochs,time_lag=time_lag, dropout=dropout)
+    result ={HISTORY_LABEL:history}
+
+def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
     hyperparameterValues = defineHyperParams(datadescr, time_lag=time_lag, epochs=epochs, dropout=dropout,
                                              shuffle=False)
     compare = ModelEvaluator(hyperparameterValues, sensore, data_headers.get(datadescr), hyperparameterValues.shuffle)
@@ -85,7 +89,7 @@ def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-1,sensore=SENSORE):
 
 
 def writeToCsvFile(to_csv):
-    outFile = generateCSVFileName('esitiMisurazioneTempoSingleRun')
+    outFile = generateCSVFileName('esitiMisurazioneHyperParams')
     keys = to_csv[0].keys()
     with open(outFile, 'w', newline='') as f:
         dict_writer = csv.DictWriter(f, fieldnames=keys)
@@ -97,11 +101,24 @@ def writeToCsvFile(to_csv):
 
 if __name__ == '__main__':
     print('iniziato')
-    for epochs in range(3, 4, 1):
-        for timelag in range(2, 3, 1):
-            for dropout_ in range(0, 1, 1):
-                dropout = dropout_ / 10
-                valori  = myMain(epochs=epochs,time_lag=timelag,dropout=dropout)
-                mape = valori.get(MAPE_LABEL)
-                print('eseguito con epoch, timesteps, dropout ',epochs,timelag,dropout)
+    to_csv=[]
+    out = {}
+    for sensore in range(3, 4, 1):
+        for epochs in range(50, 600, 50):
+            for timelag in range(2, 11, 1):
+                for dropout_ in range(0, 6, 1):
+                    dropout = dropout_ / 10
+                    valori  = myMain(epochs=epochs,time_lag=timelag,dropout=dropout,sensore=sensore)
+                    mape = valori.get(MAPE_LABEL)
+                    out = {}
+                    out[MAPE_LABEL] = mape
+                    out[SENSOR_LABEL] = sensore
+                    out[EPOCHS_LABEL] = epochs
+                    out[TIME_LAG_LABEL] = timelag
+                    out[DROPOUT_LABEL] = dropout
+                    to_csv.append(out)
+                    writeToCsvFile(to_csv)
+                    print(str(out))
+                    print('eseguito con sensore =', sensore, 'epoch= ',epochs, ' timesteps =', timelag, 'dropout=',dropout)
+    writeToCsvFile(to_csv)
     print('finito')
