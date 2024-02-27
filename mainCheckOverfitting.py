@@ -88,7 +88,7 @@ def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE,shu
 
 
 def writeToCsvFile(to_csv):
-    outFile = generateCSVFileName('esitiMisurazioneHyperParams')
+    outFile = generateCSVFileName('esitiMisurazioneHyperParamsEdOverfitting')
     keys = to_csv[0].keys()
     with open(outFile, 'w', newline='') as f:
         dict_writer = csv.DictWriter(f, fieldnames=keys)
