@@ -59,9 +59,10 @@ def myMain(time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
     result = {}
     datadescr = 'base'
     st = time.time()
-    result = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore)
-    #grafico = verificaGrafica(result,time_lag)
-    #result[HISTORY_LABEL] = grafico.get(HISTORY_LABEL)
+    resultFalse = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore,shuffle=False)
+    resultTrue  = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore,shuffle=True)
+    result[MAPE_LABEL+str(False)] = resultFalse.get(MAPE_LABEL)
+    result[MAPE_LABEL + str(True)] = resultTrue.get(MAPE_LABEL)
     return result
 
 def verificaGrafica(resultPrecedente,time_lag):
@@ -107,10 +108,7 @@ if __name__ == '__main__':
             for timelag in range(2, 11, 1):
                 for dropout_ in range(0, 6, 1):
                     dropout = dropout_ / 10
-                    valori  = myMain(epochs=epochs,time_lag=timelag,dropout=dropout,sensore=sensore)
-                    mape = valori.get(MAPE_LABEL)
-                    out = {}
-                    out[MAPE_LABEL] = mape
+                    out  = myMain(epochs=epochs,time_lag=timelag,dropout=dropout,sensore=sensore)
                     out[SENSOR_LABEL] = sensore
                     out[EPOCHS_LABEL] = epochs
                     out[TIME_LAG_LABEL] = timelag
