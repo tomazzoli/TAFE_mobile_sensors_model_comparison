@@ -6,7 +6,8 @@ import csv
 import os
 import time
 
-SENSORE=3
+OUTCSVFILE='esitiMisurazioneHyperParams'
+SENSORE =3
 HISTORY_LABEL = 'history'
 HYPERPARAM_LABEL = 'hyperparameter'
 NB_START_EPOCHS = 50
@@ -55,7 +56,7 @@ def defineHyperParams(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,shuffle=True)
     result = HyperParameters(hyperparameterDict)
     return result
 
-def myMain(time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
+def elabora(time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
     result = {}
     datadescr = 'base'
     st = time.time()
@@ -89,33 +90,72 @@ def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE,shu
 
 
 def writeToCsvFile(to_csv):
-    outFile = generateCSVFileName('esitiMisurazioneHyperParams')
+    outFile = generateCSVFileName(OUTCSVFILE)
     keys = to_csv[0].keys()
     with open(outFile, 'w', newline='') as f:
         dict_writer = csv.DictWriter(f, fieldnames=keys)
         dict_writer.writeheader()
         dict_writer.writerows(to_csv)
 
+def myLoop(esiti=[],startsensor=3,startepoches=50,startTimelag=2,startdropout=0):
+    to_csv = esiti
+    primoTurno = True
+    for sensore in range(3, 5, 1):
+        if (sensore < startsensor) and primoTurno:
+            pass
+        else:
+            for epochs in range(50, 600, 50):
+                if (epochs < startepoches) and primoTurno:
+                    pass
+                else:
+                    for timelag in range(2, 11, 1):
+                        if (timelag < startTimelag) and primoTurno:
+                            pass
+                        else:
+                            for dropout_ in range(0, 6, 1):
+                                if (dropout_ < startdropout) and primoTurno:
+                                    pass
+                                else:
+                                    dropout = dropout_ / 10
+                                    out = elabora(epochs=epochs, time_lag=timelag, dropout=dropout, sensore=sensore)
+                                    out[SENSOR_LABEL] = sensore
+                                    out[EPOCHS_LABEL] = epochs
+                                    out[TIME_LAG_LABEL] = timelag
+                                    out[DROPOUT_LABEL] = dropout
+                                    to_csv.append(out)
+                                    writeToCsvFile(to_csv)
+                                    print(str(out))
+                                    primoTurno = False
+                                    print('eseguito con sensore =', sensore, 'epoch= ', epochs, ' timesteps =', timelag, 'dropout=',
+                          dropout)
+    writeToCsvFile(to_csv)
 
+def readActualStatusCsvFile():
+    inFile = generateCSVFileName(OUTCSVFILE)
+    esiti_csv = []
+    if os.path.isfile(inFile):
+        with open(inFile, 'r', newline='') as f:
+            dict_reader = csv.DictReader(f)
+            for row in dict_reader:
+                esiti_csv.append(row)
+    return esiti_csv
 
+def lastResult(esitiCsv):
+    sensore = 3
+    epochs = 50
+    timelag = 2
+    dropout = 0
+    for row in esitiCsv:
+        sensore = int(row.get(SENSOR_LABEL))
+        epochs = int(row.get(EPOCHS_LABEL))
+        timelag = int(row.get(TIME_LAG_LABEL))
+        dropout = round(float(row.get(DROPOUT_LABEL)) * 10)
+    return sensore, epochs, timelag, dropout
 
 if __name__ == '__main__':
     print('iniziato')
-    to_csv=[]
-    out = {}
-    for sensore in range(3, 4, 1):
-        for epochs in range(50, 600, 50):
-            for timelag in range(2, 11, 1):
-                for dropout_ in range(0, 6, 1):
-                    dropout = dropout_ / 10
-                    out  = myMain(epochs=epochs,time_lag=timelag,dropout=dropout,sensore=sensore)
-                    out[SENSOR_LABEL] = sensore
-                    out[EPOCHS_LABEL] = epochs
-                    out[TIME_LAG_LABEL] = timelag
-                    out[DROPOUT_LABEL] = dropout
-                    to_csv.append(out)
-                    writeToCsvFile(to_csv)
-                    print(str(out))
-                    print('eseguito con sensore =', sensore, 'epoch= ',epochs, ' timesteps =', timelag, 'dropout=',dropout)
-    writeToCsvFile(to_csv)
+    esiti_csv = readActualStatusCsvFile()
+    sensore,epochs,timelag,dropout = lastResult(esiti_csv)
+    print (sensore,epochs,timelag,dropout)
+    myLoop(esiti=esiti_csv,startsensor=sensore,startepoches=epochs,startTimelag=timelag,startdropout=dropout)
     print('finito')
