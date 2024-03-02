@@ -161,5 +161,5 @@ if __name__ == '__main__':
     esiti_csv = readActualStatusCsvFile()
     sensore,epochs,timelag,dropout = lastResult(esiti_csv)
     print (sensore,epochs,timelag,dropout)
-    myLoop(esiti=esiti_csv,startsensor=sensore,startepoches=epochs,startTimelag=timelag,startdropout=dropout)
+    myLoop(esiti=esiti_csv,lastsensor=sensore,lastepochs=epochs,lastTimelag=timelag,lastdropout=dropout)
     print('finito')
