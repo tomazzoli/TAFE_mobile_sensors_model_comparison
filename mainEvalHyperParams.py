@@ -7,23 +7,27 @@ import os
 import time
 
 OUTCSVFILE='esitiMisurazioneHyperParams'
-SENSORE =3
 HISTORY_LABEL = 'history'
 HYPERPARAM_LABEL = 'hyperparameter'
-NB_START_EPOCHS = 50
+START_EPOCHS = 50
+START_SENSOR =5
+START_TIMESTEPS =2
+START_DROPOUT =0
+# IPERPARAMETRI DI DEFAULT PER SICUREZZA
 default_time_lag = 7
 default_epochs = 350
-nunits = 256
-thisdropout = 0.2
-numlayers = 2
+default_nunits = 256
+default_dropout = 0.2
+default_numlayers = 2
 batch_size = 1
+
 validation_split = 0.1
 # DOPPI PER VELOCITA'
 #default_epochs = 50
 #default_time_lag = 4
 #batch_size = 128
 #thisdropout = 0.2
-thisdropout = 0.0
+default_dropout = 0.0
 batch_size = 32
 
 
@@ -35,11 +39,11 @@ def defineHyperParams(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,shuffle=True)
     hyperparameterDict = {
         BATCH_SIZE_LABEL: batch_size,
         VALIDATION_SPLIT_LABEL: validation_split,
-        DROPOUT_LABEL: thisdropout,
-        NUNITS_LABEL: nunits,
+        DROPOUT_LABEL: default_dropout,
+        NUNITS_LABEL: default_nunits,
         TIME_LAG_LABEL: default_time_lag,
         EPOCHS_LABEL: default_epochs,
-        NUMLAYERS_LABEL: numlayers,
+        NUMLAYERS_LABEL: default_numlayers,
         DATADESCR_LABEL:datadescr,
         DATASET_SPLIT_RANDOM_LABEL:shuffle
     }
@@ -56,7 +60,7 @@ def defineHyperParams(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,shuffle=True)
     result = HyperParameters(hyperparameterDict)
     return result
 
-def elabora(time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
+def elabora(time_lag=-1,epochs=-1,dropout=-0.1,sensore=START_SENSOR):
     result = {}
     datadescr = 'base'
     st = time.time()
@@ -73,7 +77,7 @@ def verificaGrafica(resultPrecedente,time_lag):
     history = graficoOverfitting.eval(epochs=epochs,time_lag=time_lag, dropout=dropout)
     result ={HISTORY_LABEL:history}
 
-def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE,shuffle=False):
+def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,sensore=START_SENSOR,shuffle=False):
     hyperparameterValues = defineHyperParams(datadescr, time_lag=time_lag, epochs=epochs, dropout=dropout,
                                              shuffle=shuffle)
     compare = ModelEvaluator(hyperparameterValues, sensore, data_headers.get(datadescr), hyperparameterValues.shuffle)
@@ -97,23 +101,23 @@ def writeToCsvFile(to_csv):
         dict_writer.writeheader()
         dict_writer.writerows(to_csv)
 
-def myLoop(esiti=[],startsensor=3,startepoches=50,startTimelag=2,startdropout=0):
+def myLoop(esiti=[],lastsensor=START_SENSOR,lastepochs=START_EPOCHS,lastTimelag=START_TIMESTEPS,lastdropout=START_DROPOUT):
     to_csv = esiti
     primoTurno = True
-    for sensore in range(3, 5, 1):
-        if (sensore < startsensor) and primoTurno:
+    for sensore in range(START_SENSOR, 6, 1):
+        if (sensore < lastsensor) and primoTurno:
             pass
         else:
-            for epochs in range(50, 600, 50):
-                if (epochs < startepoches) and primoTurno:
+            for epochs in range(START_EPOCHS, 600, 50):
+                if (epochs < lastepochs) and primoTurno:
                     pass
                 else:
-                    for timelag in range(2, 11, 1):
-                        if (timelag < startTimelag) and primoTurno:
+                    for timelag in range(START_TIMESTEPS, 11, 1):
+                        if (timelag < lastTimelag) and primoTurno:
                             pass
                         else:
-                            for dropout_ in range(0, 6, 1):
-                                if (dropout_ < startdropout) and primoTurno:
+                            for dropout_ in range(START_DROPOUT, 6, 1):
+                                if (dropout_ < lastdropout) and primoTurno:
                                     pass
                                 else:
                                     dropout = dropout_ / 10
@@ -141,10 +145,10 @@ def readActualStatusCsvFile():
     return esiti_csv
 
 def lastResult(esitiCsv):
-    sensore = 3
-    epochs = 50
-    timelag = 2
-    dropout = 0
+    sensore = START_SENSOR
+    epochs = START_EPOCHS
+    timelag = START_TIMESTEPS
+    dropout = START_DROPOUT
     for row in esitiCsv:
         sensore = int(row.get(SENSOR_LABEL))
         epochs = int(row.get(EPOCHS_LABEL))
