@@ -10,7 +10,8 @@ OUTCSVFILE='esitiMisurazioneHyperParams'
 HISTORY_LABEL = 'history'
 HYPERPARAM_LABEL = 'hyperparameter'
 START_EPOCHS = 50
-START_SENSOR =5
+START_SENSOR =1
+END_SENSOR =3
 START_TIMESTEPS =2
 START_DROPOUT =0
 # IPERPARAMETRI DI DEFAULT PER SICUREZZA
@@ -104,7 +105,7 @@ def writeToCsvFile(to_csv):
 def myLoop(esiti=[],lastsensor=START_SENSOR,lastepochs=START_EPOCHS,lastTimelag=START_TIMESTEPS,lastdropout=START_DROPOUT):
     to_csv = esiti
     primoTurno = True
-    for sensore in range(START_SENSOR, 6, 1):
+    for sensore in range(START_SENSOR, END_SENSOR, 1):
         if (sensore < lastsensor) and primoTurno:
             pass
         else:
