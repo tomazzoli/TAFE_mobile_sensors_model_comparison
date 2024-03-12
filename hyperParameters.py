@@ -13,7 +13,7 @@ class HyperParameters:
         self.datadescr =  hyperparameters.get(DATADESCR_LABEL)
         self.shuffle = hyperparameters.get(DATASET_SPLIT_RANDOM_LABEL)
     def getFileNamePart(self):
-        filenamePart = TWOUNDERSCORE + NUMLAYERS_LABEL+ UNDERSCORE + str(self.numlayers)
+        filenamePart = TWOUNDERSCORE + TIME_LAG_LABEL+ UNDERSCORE + str(self.timesteps)
         filenamePart = filenamePart + TWOUNDERSCORE + NUNITS_LABEL + UNDERSCORE + str(self.nunits)
         filenamePart = filenamePart + TWOUNDERSCORE + EPOCHS_LABEL + UNDERSCORE + str(self.epochs)
         filenamePart = filenamePart + TWOUNDERSCORE + DROPOUT_LABEL + UNDERSCORE + str(self.dropout)

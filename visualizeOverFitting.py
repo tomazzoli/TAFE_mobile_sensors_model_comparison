@@ -1,4 +1,4 @@
-from constants import DIR_ESITI,DIR_GRAFICI,UNDERSCORE,XTRAIN_LABEL,XTEST_LABEL,YTEST_LABEL,YTRAIN_LABEL
+from constants import DIR_ESITI,DIR_GRAFICI,UNDERSCORE,XTRAIN_LABEL,XTEST_LABEL,YTEST_LABEL,YTRAIN_LABEL,SENSOR_LABEL
 import matplotlib.pyplot as plt
 import os
 
@@ -6,13 +6,15 @@ NB_START_EPOCHS = 50
 LOSS_METRIC_NAME = 'loss'
 class OverfittingVisualizer:
 
-    def __init__(self, hyperparameterValues, model, dataset, mape=0):
+    def __init__(self, hyperparameterValues, model, dataset, mape=0,sensore=1):
         self.__model = model
         self.__hyperparams = hyperparameterValues
         self.__dataset = dataset
         self.__mape = mape
-        self.__filename = pltfilename = (DIR_ESITI + os.path.sep + DIR_GRAFICI + os.path.sep +'mape_'
+        self.__sensor = sensore
+        self.__filename  = (DIR_ESITI + os.path.sep + DIR_GRAFICI + os.path.sep +'mape_'
                                          + format(self.__mape, ".2f")
+                                         + UNDERSCORE + SENSOR_LABEL + UNDERSCORE + str(self.__sensor)
                                          + UNDERSCORE + hyperparameterValues.getFileNamePart()+'.png')
 
     def eval(self,epochs=NB_START_EPOCHS,time_lag=-1, dropout=-1):
@@ -43,6 +45,7 @@ class OverfittingVisualizer:
         metric = history.history[metric_name]
         val_metric = history.history['val_' + metric_name]
         e = range(1, epochs + 1)
+        plt.clf()
         plt.plot(e, metric, 'bo', label='Train ' + metric_name)
         plt.plot(e, val_metric, 'r^', label='Validation ' + metric_name)
         plt.xlabel('Epoch number')
@@ -51,3 +54,4 @@ class OverfittingVisualizer:
             time_lag) + ' and dropout=' + str(dropout))
         plt.legend()
         plt.savefig(self.__filename)
+        plt. clf()
