@@ -59,7 +59,7 @@ def myMain(time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
     result = {}
     datadescr = 'base'
     st = time.time()
-    result = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore)
+    result = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore,shuffle=True)
     grafico = verificaGrafica(result,time_lag)
     result[HISTORY_LABEL] = grafico.get(HISTORY_LABEL)
     return result
@@ -103,10 +103,10 @@ if __name__ == '__main__':
     print('iniziato')
     to_csv=[]
     out = {}
-    for sensore in range(3, 4, 1):
-        for epochs in range(400, 600, 50):
-            for timelag in range(2, 4, 1):
-                for dropout_ in range(0, 2, 1):
+    for sensore in range(1, 4, 1):
+        for epochs in range(550, 600, 50):
+            for timelag in range(2, 10, 1):
+                for dropout_ in range(1, 5, 1):
                     dropout = dropout_ / 10
                     valori  = myMain(epochs=epochs,time_lag=timelag,dropout=dropout,sensore=sensore)
                     mape = valori.get(MAPE_LABEL)

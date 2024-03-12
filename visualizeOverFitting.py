@@ -43,6 +43,7 @@ class OverfittingVisualizer:
         metric = history.history[metric_name]
         val_metric = history.history['val_' + metric_name]
         e = range(1, epochs + 1)
+        plt.clf()
         plt.plot(e, metric, 'bo', label='Train ' + metric_name)
         plt.plot(e, val_metric, 'r^', label='Validation ' + metric_name)
         plt.xlabel('Epoch number')
@@ -51,3 +52,4 @@ class OverfittingVisualizer:
             time_lag) + ' and dropout=' + str(dropout))
         plt.legend()
         plt.savefig(self.__filename)
+        plt. clf()

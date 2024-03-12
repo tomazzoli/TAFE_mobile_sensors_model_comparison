@@ -51,12 +51,12 @@ def defineHyperParams(datadescr,time_lag=-1,epochs=-1,shuffle=True):
 def execEval(datadescr='-',time_lag=-1,epochs=-1,sensore=SENSORE):
     hyperparameterValues = defineHyperParams(datadescr,time_lag=time_lag,epochs=-epochs,shuffle=True)
     compare = ModelEvaluator(hyperparameterValues, sensore,data_headers.get(datadescr),hyperparameterValues.shuffle)
-    sklearn_metrics_mape_shuffle,predicted_shuffle = compare.evaluate()
+    sklearn_metrics_mape_shuffle,predicted_shuffle = compare.evaluate(reTrain=False)
     print('sklearn.metrics.mape (shuffle) ', sklearn_metrics_mape_shuffle)
 
     hyperparameterValues.shuffle=False
     compare = ModelEvaluator(hyperparameterValues, sensore, data_headers.get(datadescr),hyperparameterValues.shuffle)
-    sklearn_metrics_mape_fromTop, predicted_fromTop = compare.evaluate()
+    sklearn_metrics_mape_fromTop, predicted_fromTop = compare.evaluate(reTrain=False)
 
     print('sklearn.metrics.mape (from top) ', sklearn_metrics_mape_fromTop)
 
@@ -68,13 +68,13 @@ def myMain(time_lag=-1,epochs=-1,sensore=SENSORE):
     #
     # out['esteso'] = execEval(datadescr='esteso')
     #
-    #result['meno_tempo-shuffle'],result['meno_tempo-fromTop'] = execEval(datadescr='meno_tempo',time_lag=time_lag,epochs=-epochs,sensore=sensore)
+    result['meno_tempo-shuffle'],result['meno_tempo-fromTop'] = execEval(datadescr='meno_tempo',time_lag=time_lag,epochs=-epochs,sensore=sensore)
     #result['senza_distanza-shuffle'],result['senza_distanza-fromTop'] = execEval(datadescr='senza_distanza',time_lag=time_lag,epochs=-epochs,sensore=sensore)
-    #result['senza_evja-shuffle'],result['senza_evja-fromTop'] = execEval(datadescr='senza_evja',time_lag=time_lag,epochs=-epochs,sensore=sensore)
+    result['senza_evja-shuffle'],result['senza_evja-fromTop'] = execEval(datadescr='senza_evja',time_lag=time_lag,epochs=-epochs,sensore=sensore)
     return result
 
 def writeToCsvFile(to_csv):
-    outFile = generateCSVFileName('esiti4567_timesteps5varieEprochs')
+    outFile = generateCSVFileName('esitiAblazione_timesteps5Epochs350')
     keys = to_csv[0].keys()
     with open(outFile, 'w', newline='') as f:
         dict_writer = csv.DictWriter(f, fieldnames=keys)
@@ -85,9 +85,9 @@ if __name__ == '__main__':
     print('iniziato')
     to_csv=[]
     out = {}
-    for sensore in range(4,8):#era 1,8
+    for sensore in range(1,2):#era 1,8
         for timesteps in range(5, 6):#era 2,11
-            for epochs in range(50, 600,50):#era 50, 600,50
+            for epochs in range(10, 60,50):#era 50, 600,50
                 out = myMain(epochs = epochs,time_lag = timesteps,sensore=sensore)
                 out['sensore']= sensore
                 out['epochs'] = epochs
