@@ -59,9 +59,9 @@ def myMain(time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE):
     result = {}
     datadescr = 'base'
     st = time.time()
-    result = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore,shuffle=True)
-    grafico = verificaGrafica(result,time_lag)
-    result[HISTORY_LABEL] = grafico.get(HISTORY_LABEL)
+    result = calcolaMape(datadescr,time_lag=time_lag,epochs=epochs,dropout=dropout,sensore=sensore)
+    #grafico = verificaGrafica(result,time_lag)
+    #result[HISTORY_LABEL] = grafico.get(HISTORY_LABEL)
     return result
 
 def verificaGrafica(resultPrecedente,time_lag):
@@ -70,7 +70,6 @@ def verificaGrafica(resultPrecedente,time_lag):
                                                resultPrecedente.get(DIR_DATI), mape=resultPrecedente.get(MAPE_LABEL))
     history = graficoOverfitting.eval(epochs=epochs,time_lag=time_lag, dropout=dropout)
     result ={HISTORY_LABEL:history}
-    return result
 
 def calcolaMape(datadescr,time_lag=-1,epochs=-1,dropout=-0.1,sensore=SENSORE,shuffle=False):
     hyperparameterValues = defineHyperParams(datadescr, time_lag=time_lag, epochs=epochs, dropout=dropout,
@@ -103,10 +102,10 @@ if __name__ == '__main__':
     print('iniziato')
     to_csv=[]
     out = {}
-    for sensore in range(1, 4, 1):
-        for epochs in range(550, 600, 50):
-            for timelag in range(2, 10, 1):
-                for dropout_ in range(1, 5, 1):
+    for sensore in range(3, 4, 1):
+        for epochs in range(50, 600, 50):
+            for timelag in range(2, 11, 1):
+                for dropout_ in range(0, 6, 1):
                     dropout = dropout_ / 10
                     valori  = myMain(epochs=epochs,time_lag=timelag,dropout=dropout,sensore=sensore)
                     mape = valori.get(MAPE_LABEL)
