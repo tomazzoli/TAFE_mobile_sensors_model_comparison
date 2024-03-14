@@ -5,7 +5,7 @@ import csv
 import os
 
 SENSORE = 4
-default_time_lag = 7
+default_time_lag = 5
 default_epochs = 350
 nunits = 256
 thisdropout = 0.2
@@ -73,8 +73,8 @@ def myMain(time_lag=-1,epochs=-1,sensore=SENSORE):
     result['senza_evja-shuffle'],result['senza_evja-fromTop'] = execEval(datadescr='senza_evja',time_lag=time_lag,epochs=-epochs,sensore=sensore)
     return result
 
-def writeToCsvFile(to_csv):
-    outFile = generateCSVFileName('esitiAblazione_timesteps5Epochs350')
+def writeToCsvFile(to_csv,epochs = default_epochs,time_lag=default_time_lag):
+    outFile = generateCSVFileName('esitiAblazione_timesteps'+str(time_lag)+'Epochs'+str(epochs))
     keys = to_csv[0].keys()
     with open(outFile, 'w', newline='') as f:
         dict_writer = csv.DictWriter(f, fieldnames=keys)
@@ -85,16 +85,16 @@ if __name__ == '__main__':
     print('iniziato')
     to_csv=[]
     out = {}
+    epoch_=400
+    timesteps = 5
     for sensore in range(1,2):#era 1,8
-        for timesteps in range(5, 6):#era 2,11
-            for epochs in range(10, 60,50):#era 50, 600,50
-                out = myMain(epochs = epochs,time_lag = timesteps,sensore=sensore)
-                out['sensore']= sensore
-                out['epochs'] = epochs
-                out['timesteps'] = timesteps
-                to_csv.append(out)
-                writeToCsvFile(to_csv)
+        out = myMain(epochs = epoch_,time_lag = timesteps,sensore=sensore)
+        out['sensore']= sensore
+        out['epochs'] = epoch_
+        out['timesteps'] = timesteps
+        to_csv.append(out)
+        writeToCsvFile(to_csv,epochs = epoch_,time_lag = timesteps)
         print(str(out))
 
-    writeToCsvFile(to_csv)
+    writeToCsvFile(to_csv,epochs = epoch_,time_lag = timesteps)
     print('finito')

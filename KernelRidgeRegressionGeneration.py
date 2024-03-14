@@ -1,12 +1,12 @@
 from genericRegressionGeneration import RegressionManager
-from sklearn.linear_model import Lasso
+from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import GammaRegressor
-class GammaRegression(RegressionManager):
+class KernelRidgeRegression(RegressionManager):
 
     def generateModel(self):
-        model = GammaRegressor()
+        model = KernelRidge()
         return model
 
     def getModelName(self):
-        return "GammaRegressor"
+        return "KernelRidge"
 

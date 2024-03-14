@@ -4,7 +4,7 @@ from fileManager import FileDataManager
 from inputGeneration import DatasetManager
 from StochasticGradientDescentRegressionGeneration import StochasticGradientDescentRegressor
 from LassoRegressionGeneration import LassoRegressor
-from GammaRegressionGeneration import GammaRegression
+from KernelRidgeRegressionGeneration import KernelRidgeRegression
 from sklearn.model_selection import train_test_split
 from constants import *
 
@@ -60,12 +60,12 @@ class RegressionEvaluator:
         Lassoname = LassoManager.getModelName()
         mymodels[Lassoname] = Lasso_model
 
-        '''GammaManager = GammaRegression(self.__sensor)
-        GammaManager.trainModel(self.__x_train, self.__y_train)
-        Gamma_model = GammaManager.getModel()
-        Gammaname = GammaManager.getModelName()
-        mymodels[Gammaname] = Gamma_model
-        '''
+        TerzoManager = KernelRidgeRegression(self.__sensor)
+        TerzoManager.trainModel(self.__x_train, self.__y_train)
+        Terzo_model = TerzoManager.getModel()
+        altroname = TerzoManager.getModelName()
+        mymodels[altroname] = Terzo_model
+        ''''''
 
         return mymodels
 
