@@ -20,7 +20,7 @@ class ModelEvaluator:
         self.__dataManager = self.__initDataManager(data_headers)
         self.__x_train, self.__x_test, self.__y_train, self.__y_test = self.__create_dataset(shuffle)
 
-        self.__modelbidir = self.__initModel()
+        self.__modelbidirmanager = self.__initModel()
 
     def __generateFileName(self):
         filename = DIR_DATI+os.path.sep+CSV_BASE_NAME+str(self.__sensor)+CSV_EXTENSION
@@ -50,18 +50,18 @@ class ModelEvaluator:
         mm = BILSTMModelManager(self.__sensor, self.hyperparameters, reTrain=True,dirModelli=dirModelli)
         if mm.isModelTrained() == False:
             mm.trainModel(self.__x_train, self.__y_train)
-        my_model = mm.getModel()
+        my_model = mm
         return my_model
 
     def evaluate(self,reTrain=True):
         if reTrain:
-            self.__modelbidir.train(self.__x_train, self.__y_train)
-            self.__modelbidir.saveModel()
-        mape_bidir = self.evaluateSingleModel(self.__modelbidir)
+            self.__modelbidirmanager.trainModel(self.__x_train, self.__y_train)
+            self.__modelbidirmanager.saveModel()
+        mape_bidir = self.evaluateSingleModel(self.__modelbidirmanager.getModel())
         # mape_binormal = self.evaluateSingleModel(self.__modelnormal)
         # risolvere problema con evaluate che si pianta nella denormalizzazione
-        mape_binormal = -1
-        return mape_bidir, mape_binormal
+        history_bidir = self.__modelbidirmanager.getTrainingHistory()
+        return mape_bidir, history_bidir
 
     def evaluateSingleModel(self, model):
         batch_size = self.hyperparameters.batch_size
@@ -78,7 +78,7 @@ class ModelEvaluator:
 
     def evaluateOld(self):
         batch_size = self.hyperparameters.batch_size
-        result = self.__modelbidir.predict(self.__x_test, batch_size=batch_size)
+        result = self.__modelbidirmanager.getModel().predict(self.__x_test, batch_size=batch_size)
         scaler = self.__dataManager.getPredictedNormalizer()
         #predicted = scaler.inverse_transform(result.reshape(len(result), len(result[0])))
         #y_test = scaler.inverse_transform(self.__y_test.reshape(len(self.__y_test), len(self.__y_test[0])))
@@ -96,5 +96,5 @@ class ModelEvaluator:
         return result
 
     def getBILSTMModel(self):
-        result = {BILSTM_MODEL_LABEL:self.__modelbidir}
+        result = {BILSTM_MODEL_LABEL:self.__modelbidirmanager.getModel()}
         return result

@@ -17,16 +17,15 @@ class OverfittingVisualizer:
                                          + UNDERSCORE + SENSOR_LABEL + UNDERSCORE + str(self.__sensor)
                                          + UNDERSCORE + hyperparameterValues.getFileNamePart()+'.png')
 
-    def eval(self,epochs=NB_START_EPOCHS,time_lag=-1, dropout=-1):
+    def eval(self,history=None,epochs=NB_START_EPOCHS,time_lag=-1, dropout=-1):
 
         x_train = self.__dataset.get(XTRAIN_LABEL)
         y_train = self.__dataset.get(YTRAIN_LABEL)
         x_test = self.__dataset.get(XTEST_LABEL)
         y_test = self.__dataset.get(YTEST_LABEL)
         batch = self.__hyperparams.batch_size
-
-        history = self.__model.fit(x_train, y_train, epochs=epochs, batch_size=batch, validation_data=(x_test, y_test),
-                              verbose=0)
+        #if history == None:
+        #    history = self.__model.fit(x_train, y_train, epochs=epochs, batch_size=batch, validation_data=(x_test, y_test),verbose=0)
         self.__eval_metric(history,LOSS_METRIC_NAME,epochs=epochs,time_lag=time_lag, dropout=dropout)
 
     def __eval_metric(self, history, metric_name, epochs=NB_START_EPOCHS,time_lag=-1, dropout=-1):

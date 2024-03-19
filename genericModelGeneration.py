@@ -11,10 +11,12 @@ class ModelManager:
 
     def __init__(self,sensor,hyperparams,reTrain=False,dirModelli='modelli'):
         self.__isTrained = False
+        self.__history = None
         self.hyperparams = hyperparams
         self.modelName = LSTM_MODEL_LABEL
         self.__filename = self.__composeFileName(sensor,dirModelli,modelName=self.modelName)
         self.__model = self.__initModel(reTrain)
+
 
 
     def generateModel(self):
@@ -44,7 +46,7 @@ class ModelManager:
         return filename
 
     def trainModel(self,x_train,y_train):
-        history = self.__model.fit(x_train, y_train, epochs=self.hyperparams.epochs, batch_size=self.hyperparams.batch_size,
+        self.__history = self.__model.fit(x_train, y_train, epochs=self.hyperparams.epochs, batch_size=self.hyperparams.batch_size,
                                validation_split=self.hyperparams.validation_split)
         #self.__model.save(self.__filename)
         self.__isTrained = True
@@ -60,3 +62,6 @@ class ModelManager:
 
     def saveModel(self):
         self.__model.save(self.__filename)
+
+    def getTrainingHistory(self):
+        return self.__history

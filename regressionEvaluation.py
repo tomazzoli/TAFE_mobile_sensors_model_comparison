@@ -1,4 +1,7 @@
 import os
+import numpy as np
+from sklearn.impute import SimpleImputer
+
 from hyperParameters import HyperParameters
 from fileManager import FileDataManager
 from inputGeneration import DatasetManager
@@ -26,7 +29,7 @@ class RegressionEvaluator:
         self.__regressionModels = self.__initModels()
 
     def __generateFileName(self):
-        filename = DIR_DATI+os.path.sep+CSV_BASE_NAME+str(self.__sensor)+CSV_EXTENSION
+        filename = DIR_DATI+os.path.sep+CSV_UNPATCHED_BASE_NAME+str(self.__sensor)+CSV_EXTENSION
         return filename
 
     def __initDataManager(self,data_headers):
@@ -39,6 +42,9 @@ class RegressionEvaluator:
         dataset = self.__dataManager.getDataArray()
         x = dataset[:,1:43]
         y = dataset[:,-1]
+        cleaner = SimpleImputer(missing_values=np.nan, strategy='constant', fill_value=0)
+        cleaner.fit(x,y)
+        x = cleaner.transform(x)
         if shuffle:
             [x_train, x_test, y_train, y_test] = train_test_split(x, y, test_size=0.2, random_state=23)
         else:
@@ -48,17 +54,17 @@ class RegressionEvaluator:
 
     def __initModels(self,dirModelli=DIR_MODELLI):
         mymodels = {}
-        SGDManager = StochasticGradientDescentRegressor(self.__sensor)
-        SGDManager.trainModel(self.__x_train, self.__y_train)
-        SDG_model = SGDManager.getModel()
-        SDGname = SGDManager.getModelName()
-        mymodels[SDGname]=SDG_model
+        PrimoManager = LassoRegressor(self.__sensor)
+        PrimoManager.trainModel(self.__x_train, self.__y_train)
+        Primo_model = PrimoManager.getModel()
+        Primoname = PrimoManager.getModelName()
+        mymodels[Primoname]=Primo_model
 
-        LassoManager = LassoRegressor(self.__sensor)
-        LassoManager.trainModel(self.__x_train, self.__y_train)
-        Lasso_model = LassoManager.getModel()
-        Lassoname = LassoManager.getModelName()
-        mymodels[Lassoname] = Lasso_model
+        SecondoManager = StochasticGradientDescentRegressor(self.__sensor)
+        SecondoManager.trainModel(self.__x_train, self.__y_train)
+        Secondo_model = SecondoManager.getModel()
+        Secondoname = SecondoManager.getModelName()
+        mymodels[Secondoname] = Secondo_model
 
         TerzoManager = KernelRidgeRegression(self.__sensor)
         TerzoManager.trainModel(self.__x_train, self.__y_train)

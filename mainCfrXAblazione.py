@@ -51,12 +51,12 @@ def defineHyperParams(datadescr,time_lag=-1,epochs=-1,shuffle=True):
 def execEval(datadescr='-',time_lag=-1,epochs=-1,sensore=SENSORE):
     hyperparameterValues = defineHyperParams(datadescr,time_lag=time_lag,epochs=-epochs,shuffle=True)
     compare = ModelEvaluator(hyperparameterValues, sensore,data_headers.get(datadescr),hyperparameterValues.shuffle)
-    sklearn_metrics_mape_shuffle,predicted_shuffle = compare.evaluate(reTrain=False)
+    sklearn_metrics_mape_shuffle,history_shuffle = compare.evaluate(reTrain=False)
     print('sklearn.metrics.mape (shuffle) ', sklearn_metrics_mape_shuffle)
 
     hyperparameterValues.shuffle=False
     compare = ModelEvaluator(hyperparameterValues, sensore, data_headers.get(datadescr),hyperparameterValues.shuffle)
-    sklearn_metrics_mape_fromTop, predicted_fromTop = compare.evaluate(reTrain=False)
+    sklearn_metrics_mape_fromTop, history_fromTop = compare.evaluate(reTrain=False)
 
     print('sklearn.metrics.mape (from top) ', sklearn_metrics_mape_fromTop)
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     out = {}
     epoch_=400
     timesteps = 5
-    for sensore in range(1,2):#era 1,8
+    for sensore in range(1,8):#era 1,8
         out = myMain(epochs = epoch_,time_lag = timesteps,sensore=sensore)
         out['sensore']= sensore
         out['epochs'] = epoch_

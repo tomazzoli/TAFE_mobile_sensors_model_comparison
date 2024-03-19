@@ -4,6 +4,7 @@ DIR_ESITI = 'esiti'
 DIR_DATI = 'dati'
 DIR_GRAFICI = 'grafici'
 CSV_BASE_NAME='dataset_poi_'
+CSV_UNPATCHED_BASE_NAME='dataset_unpatched_poi_'
 data_header_index = 'timestamp_normalizzato'
 data_headers = {'base': data_header_base,
                'esteso': data_header_esteso,
