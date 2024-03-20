@@ -86,7 +86,7 @@ if __name__ == '__main__':
     to_csv=[]
     out = {}
     epoch_=400
-    timesteps = 5
+    timesteps = 3
     for sensore in range(1,8):#era 1,8
         out = myMain(epochs = epoch_,time_lag = timesteps,sensore=sensore)
         out['sensore']= sensore
