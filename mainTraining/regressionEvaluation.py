@@ -2,18 +2,15 @@ import os
 import numpy as np
 from sklearn.impute import SimpleImputer
 
-from hyperParameters import HyperParameters
-from fileManager import FileDataManager
-from inputGeneration import DatasetManager
+from mainTraining.fileManager import FileDataManager
+from mainTraining.inputGeneration import DatasetManager
 from StochasticGradientDescentRegressionGeneration import StochasticGradientDescentRegressor
-from LassoRegressionGeneration import LassoRegressor
-from KernelRidgeRegressionGeneration import KernelRidgeRegression
+from mainTraining.LassoRegressionGeneration import LassoRegressor
+from mainTraining.KernelRidgeRegressionGeneration import KernelRidgeRegression
 from sklearn.model_selection import train_test_split
-from constants import *
+from mainTraining.constants import *
 
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import (mean_absolute_error as mae,
-                             mean_absolute_percentage_error as mape)
+from sklearn.metrics import (mean_absolute_percentage_error as mape)
 
 
 class RegressionEvaluator:

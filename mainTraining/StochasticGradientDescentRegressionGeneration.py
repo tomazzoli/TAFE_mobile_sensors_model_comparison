@@ -1,5 +1,4 @@
-from genericRegressionGeneration import RegressionManager
-from sklearn.linear_model import SGDRegressor
+from mainTraining.genericRegressionGeneration import RegressionManager
 from sklearn.linear_model import RidgeCV
 from sklearn.svm import LinearSVR
 from sklearn.ensemble import HistGradientBoostingRegressor
